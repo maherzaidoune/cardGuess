@@ -22,14 +22,13 @@ import {
 } from 'react-native';
 import axios from 'axios'
 import Carousel from 'react-native-snap-carousel';
-import TouchableScale from 'react-native-touchable-scale';
 import Card from './src/card/Card';
 
 const cards = Array.from(Array(52).keys());
 const SLIDER_WIDTH = Dimensions.get('window').width;
 const ITEM_WIDTH = Math.round(SLIDER_WIDTH);
 const ITEM_HEIGHT = Dimensions.get('window').height * 0.5;
-
+const values = ['ACE','1','2','3','4','5','6','7','8','9', '10','JACK', 'QUEEN' , 'KING']
 const App = () => {
 
   type Nullable<T> = T | null;
@@ -61,11 +60,13 @@ const App = () => {
 
   const [score, setScore] = useState<number>(0)
 
+  const [loading, setLoading] = useState(false)
+
   const [currentCard, setcurrentCard] = useState<Nullable<cardDetails>>(null)
 
   const carousel = useRef(null)
 
-  const renderCard = () => <Card url={currentCard ? currentCard.cards[0].image : ''} />;
+  const renderCard = () => <Card loading={loading} url={currentCard ? currentCard.cards[0].image : ''} />;
 
   const setUpNewDeck = () => {
     axios.get<deck>(`https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1`).then(res => {
@@ -77,30 +78,37 @@ const App = () => {
   const setUpNewCard = (deckId: string, guess: Nullable<boolean>) => {
     axios.get<cardDetails>(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=1`).then(res => {
       console.log("Number(res.data.cards[0].value) == ", Number(res.data.cards[0].value) );
-      if(guess != null && !isNaN(Number(res.data.cards[0].value))){
-        if(guess && Number(res.data.cards[0].value) > Number(currentCard?.cards[0].value))
-            setScore(score + 1);
-        else if(!guess && Number(res.data.cards[0].value) < Number(currentCard?.cards[0].value))
+      if(guess != null && currentCard){
+        if(guess && values.indexOf(res.data.cards[0].value) > values.indexOf(currentCard?.cards[0].value))
+        setScore(score + 1);
+        else if(!guess && values.indexOf(res.data.cards[0].value) < values.indexOf(currentCard?.cards[0].value))
             setScore(score + 1);
       }
       setcurrentCard(res.data)
-    }).catch(e => console.log(e))
+      setLoading(false);
+    }).catch(e => setLoading(false))
   }
+  
   const bet = (b: boolean) => {
     console.log("clock");
+    setLoading(true);
     carousel.current?.snapToNext(true)
     deck && setUpNewCard(deck.deck_id, b)
   }
+
   useEffect(() => {
     setUpNewDeck()
   }, [])
 
-
-  
-
+  useEffect(() => {
+    if(currentCard?.remaining === 0){
+      setUpNewDeck()
+    }
+  }, [currentCard])
 
   if(!deck) return (
-    <View style={{flex: 1,
+    <View style={{
+      flex: 1,
       justifyContent: 'center',
      alignItems: 'center'}}>
        <ActivityIndicator color={'red'} />
