@@ -134,7 +134,8 @@ const App = () => {
           />
         </View>
      
-        <View style={{flex: 1,
+        <View 
+          pointerEvents={loading ? 'none' : 'auto'} style={{flex: 1,
            flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center'}}>
         <TouchableOpacity
             activeOpacity={0.5}
