@@ -127,9 +127,11 @@ const App = () => {
             itemWidth={ITEM_WIDTH}
             itemHeight={ITEM_HEIGHT}
             sliderWidth={SLIDER_WIDTH}
+            sliderHeight={ITEM_HEIGHT}
             scrollEnabled={false}
             useScrollView={false}
             layout={'tinder'}
+            lockScrollWhileSnapping
             loop={true}
           />
         </View>
@@ -146,7 +148,8 @@ const App = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => bet(false)}  >
+          onPress={() => bet(false)}  
+          >
             <Text>Lower</Text>
         </TouchableOpacity>
         </View>

@@ -10,6 +10,7 @@ const Card = ({url, loading}: {url: String, loading: boolean}) => {
     if(loading || url === null) 
     return (
         <View style={{
+            backgroundColor: '#fff',
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
